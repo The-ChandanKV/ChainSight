@@ -1,66 +1,95 @@
+import { useState } from 'react';
 import useSupplyChainStore from "../store/supplyChainStore";
+import AddShipmentModal from './AddShipmentModal';
+import ShipmentTracker from './ShipmentTracker';
 
 export default function Dashboard() {
-  const { shipments, addShipment, updateStatus } = useSupplyChainStore();
+  const { shipments, addShipment, advanceStatus } = useSupplyChainStore();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleAdd = () => {
+  const handleAddShipment = (formData: any) => {
     const id = Date.now();
     addShipment({
       id,
-      name: `Shipment ${id}`,
-      origin: "Bangalore",
-      destination: "Mumbai",
-      status: "In Transit",
+      shipmentId: formData.shipmentId,
+      name: `Shipment ${formData.shipmentId}`,
+      origin: formData.origin,
+      destination: formData.destination,
+      status: formData.status,
+      eta: formData.eta || undefined,
+      temperature: formData.temperature || undefined,
+      condition: formData.condition || undefined,
     });
+    setIsModalOpen(false);
+  };
+
+  const testAdvance = (id: number) => {
+    console.log('TEST: Advancing shipment', id);
+    advanceStatus(id);
   };
 
   return (
-    <div className="glass-dark p-6 rounded-xl shadow-2xl mt-6 border border-white/10">
-      <button
-        onClick={handleAdd}
-        className="mb-6 bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-3 rounded-lg hover:from-blue-500 hover:to-purple-500 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold"
-      >
-        ✨ Add Dummy Shipment
-      </button>
+    <div className="space-y-6">
+      {/* Header with Add Shipment Button */}
+      <div className="flex justify-between items-center">
+        <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+          Supply Chain Dashboard
+        </h2>
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-3 rounded-lg hover:from-blue-500 hover:to-purple-500 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold flex items-center gap-2"
+          type="button"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          Add Shipment
+        </button>
+      </div>
 
+      {/* Shipments List */}
       {shipments.length === 0 ? (
-        <p className="text-gray-400 text-center py-8">No shipments yet. Add one to get started!</p>
+        <div className="glass-dark p-12 rounded-xl text-center border border-white/10">
+          <div className="mb-4">
+            <svg className="w-20 h-20 mx-auto text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+          </div>
+          <p className="text-gray-400 text-xl mb-2">No shipments yet</p>
+          <p className="text-gray-500 mb-6">Click "Add Shipment" to create your first shipment and start tracking!</p>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-3 rounded-lg hover:from-blue-500 hover:to-purple-500 transition-all duration-300 transform hover:scale-105 shadow-lg font-semibold inline-flex items-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Create First Shipment
+          </button>
+        </div>
       ) : (
-        <ul className="space-y-4">
-          {shipments.map((s, index) => (
-            <li
-              key={s.id}
-              className="glass p-4 rounded-lg flex justify-between items-center transform hover:scale-[1.02] transition-all duration-300 hover:shadow-lg animate-fadeInUp"
+        <div className="space-y-6">
+          {shipments.map((shipment, index) => (
+            <div
+              key={shipment.id}
+              className="animate-fadeInUp"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <div>
-                <p className="font-semibold text-lg text-blue-300">{s.name}</p>
-                <p className="text-sm text-gray-300 mt-1 flex items-center gap-2">
-                  <span>📍 {s.origin}</span>
-                  <span className="text-blue-400">→</span>
-                  <span>📍 {s.destination}</span>
-                </p>
-              </div>
-              <button
-                onClick={() =>
-                  updateStatus(
-                    s.id,
-                    s.status === "In Transit" ? "Delivered" : "In Transit"
-                  )
-                }
-                className={`text-sm px-4 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-110 ${
-                  s.status === "Delivered"
-                    ? "bg-green-600 hover:bg-green-500"
-                    : "bg-yellow-600 hover:bg-yellow-500"
-                }`}
-              >
-                {s.status === "Delivered" ? "✓ " : "🚚 "}
-                {s.status}
-              </button>
-            </li>
+              <ShipmentTracker
+                shipment={shipment}
+                onAdvanceStatus={() => advanceStatus(shipment.id)}
+              />
+            </div>
           ))}
-        </ul>
+        </div>
       )}
+
+      {/* Add Shipment Modal */}
+      <AddShipmentModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleAddShipment}
+      />
     </div>
   );
 }
