@@ -7,6 +7,11 @@ export default function Dashboard() {
   const { shipments, addShipment, advanceStatus } = useSupplyChainStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const onClickAddShipment = () => {
+    console.log('Opening Add Shipment Modal', isModalOpen);
+    setIsModalOpen(true);
+  }
+
   const handleAddShipment = (formData: any) => {
     const id = Date.now();
     addShipment({
@@ -36,7 +41,7 @@ export default function Dashboard() {
           Supply Chain Dashboard
         </h2>
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => onClickAddShipment()}
           className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-3 rounded-lg hover:from-blue-500 hover:to-purple-500 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold flex items-center gap-2"
           type="button"
         >
@@ -66,6 +71,11 @@ export default function Dashboard() {
             </svg>
             Create First Shipment
           </button>
+          {/* Add Shipment Modal */}
+      {isModalOpen&&<AddShipmentModal
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleAddShipment}
+      />}
         </div>
       ) : (
         <div className="space-y-6">
@@ -85,11 +95,10 @@ export default function Dashboard() {
       )}
 
       {/* Add Shipment Modal */}
-      <AddShipmentModal
-        isOpen={isModalOpen}
+      {isModalOpen&&<AddShipmentModal
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleAddShipment}
-      />
+      />}
     </div>
   );
 }
