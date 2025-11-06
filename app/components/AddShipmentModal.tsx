@@ -12,12 +12,11 @@ interface ShipmentFormData {
 }
 
 interface AddShipmentModalProps {
-  isOpen: boolean;
   onClose: () => void;
   onSubmit: (shipment: ShipmentFormData) => void;
 }
 
-export default function AddShipmentModal({ isOpen, onClose, onSubmit }: AddShipmentModalProps) {
+export default function AddShipmentModal({  onClose, onSubmit }: AddShipmentModalProps) {
   const [formData, setFormData] = useState<ShipmentFormData>({
     shipmentId: '',
     origin: '',
@@ -47,7 +46,6 @@ export default function AddShipmentModal({ isOpen, onClose, onSubmit }: AddShipm
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
