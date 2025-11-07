@@ -13,8 +13,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <Navbar />
-      <div className="p-8 pt-28">
-        <h2 className="text-3xl font-semibold mb-6 animate-fadeInUp">Supply Chain Dashboard</h2>
+      <div className="p-8 pt-28">        
         <div className="animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
           <Dashboard />
         </div>

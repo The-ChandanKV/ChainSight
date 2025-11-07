@@ -1,21 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import useSupplyChainStore from "../store/supplyChainStore";
 import AddShipmentModal from './AddShipmentModal';
 import ShipmentTracker from './ShipmentTracker';
 
 export default function Dashboard() {
-  const { shipments, addShipment, advanceStatus } = useSupplyChainStore();
+  const { shipments, addShipment, advanceStatus, fetchShipments, loading, error } = useSupplyChainStore();
+  
+  console.log('Dashboard shipments:', shipments);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    fetchShipments();
+  }, [fetchShipments]);
 
   const onClickAddShipment = () => {
     console.log('Opening Add Shipment Modal', isModalOpen);
     setIsModalOpen(true);
   }
 
-  const handleAddShipment = (formData: any) => {
-    const id = Date.now();
-    addShipment({
-      id,
+  const handleAddShipment = async (formData: any) => {
+    await addShipment({
       shipmentId: formData.shipmentId,
       name: `Shipment ${formData.shipmentId}`,
       origin: formData.origin,
@@ -28,7 +32,7 @@ export default function Dashboard() {
     setIsModalOpen(false);
   };
 
-  const testAdvance = (id: number) => {
+  const testAdvance = (id: string) => {
     console.log('TEST: Advancing shipment', id);
     advanceStatus(id);
   };
@@ -71,11 +75,6 @@ export default function Dashboard() {
             </svg>
             Create First Shipment
           </button>
-          {/* Add Shipment Modal */}
-      {isModalOpen&&<AddShipmentModal
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleAddShipment}
-      />}
         </div>
       ) : (
         <div className="space-y-6">

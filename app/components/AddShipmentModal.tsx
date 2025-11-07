@@ -13,7 +13,7 @@ interface ShipmentFormData {
 
 interface AddShipmentModalProps {
   onClose: () => void;
-  onSubmit: (shipment: ShipmentFormData) => void;
+  onSubmit: (shipment: ShipmentFormData) => Promise<void>;
 }
 
 export default function AddShipmentModal({  onClose, onSubmit }: AddShipmentModalProps) {
@@ -27,9 +27,9 @@ export default function AddShipmentModal({  onClose, onSubmit }: AddShipmentModa
     condition: 'Good'
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    await onSubmit(formData);
     setFormData({
       shipmentId: '',
       origin: '',

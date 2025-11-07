@@ -1,6 +1,6 @@
-# Welcome to React Router!
+# ChainSight - Supply Chain Management System
 
-A modern, production-ready template for building full-stack React applications using React Router.
+A modern, production-ready template for building full-stack React applications using React Router with MongoDB backend for shipment tracking.
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
 
@@ -12,9 +12,24 @@ A modern, production-ready template for building full-stack React applications u
 - 🔄 Data loading and mutations
 - 🔒 TypeScript by default
 - 🎉 TailwindCSS for styling
+- 🗄️ MongoDB integration for data persistence
+- 📡 RESTful API for shipment management
 - 📖 [React Router docs](https://reactrouter.com/)
 
+## API Routes
+
+The application provides the following REST API endpoints:
+
+- `GET /api/shipments` - Fetch all shipments
+- `POST /api/shipments` - Create a new shipment
+- `PUT /api/shipments/:id/status` - Update shipment status
+
 ## Getting Started
+
+### Prerequisites
+
+- Node.js (v18 or higher)
+- MongoDB (running locally or MongoDB Atlas)
 
 ### Installation
 
@@ -23,6 +38,41 @@ Install the dependencies:
 ```bash
 npm install
 ```
+
+### Environment Setup
+
+Create a `.env` file in the root directory:
+
+```env
+MONGODB_URI=mongodb://localhost:27017/chainsight
+```
+
+Or for MongoDB Atlas:
+
+```env
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/chainsight?retryWrites=true&w=majority
+```
+
+### MongoDB Setup
+
+**Local MongoDB:**
+1. Install MongoDB Community Edition
+2. Start MongoDB service:
+   ```bash
+   # On macOS with Homebrew
+   brew services start mongodb-community
+
+   # On Windows
+   net start MongoDB
+
+   # On Linux
+   sudo systemctl start mongod
+   ```
+
+**MongoDB Atlas (Cloud):**
+1. Create account at [MongoDB Atlas](https://www.mongodb.com/atlas)
+2. Create a cluster and database
+3. Get connection string and add to `.env`
 
 ### Development
 
