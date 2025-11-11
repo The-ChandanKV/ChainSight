@@ -14,6 +14,9 @@ A modern, production-ready template for building full-stack React applications u
 - 🎉 TailwindCSS for styling
 - 🗄️ MongoDB integration for data persistence
 - 📡 RESTful API for shipment management
+- ⛓️ **Blockchain integration for tamper-proof tracking**
+- 🔐 **Ethereum/Polygon support for immutable audit trails**
+- 📝 **Smart contract for shipment verification**
 - 📖 [React Router docs](https://reactrouter.com/)
 
 ## API Routes
@@ -44,7 +47,14 @@ npm install
 Create a `.env` file in the root directory:
 
 ```env
+# MongoDB Configuration
 MONGODB_URI=mongodb://localhost:27017/chainsight
+
+# Blockchain Configuration (Optional)
+BLOCKCHAIN_ENABLED=false
+BLOCKCHAIN_RPC_URL=https://sepolia.infura.io/v3/YOUR_INFURA_PROJECT_ID
+CONTRACT_ADDRESS=
+BLOCKCHAIN_PRIVATE_KEY=
 ```
 
 Or for MongoDB Atlas:
@@ -52,6 +62,8 @@ Or for MongoDB Atlas:
 ```env
 MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/chainsight?retryWrites=true&w=majority
 ```
+
+**Note**: Blockchain integration is optional. Set `BLOCKCHAIN_ENABLED=true` only after deploying the smart contract. See [Blockchain Setup](#blockchain-integration) below.
 
 ### MongoDB Setup
 
@@ -132,6 +144,114 @@ Make sure to deploy the output of `npm run build`
 
 This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
 
+## Blockchain Integration
+
+### Overview
+
+ChainSight includes blockchain integration to make your supply chain **tamper-proof and traceable**. Every shipment creation and status update is recorded on-chain.
+
+### Features
+
+- ✅ **Immutable Records**: All shipment data is hashed and stored on blockchain
+- ✅ **Audit Trail**: Complete history of all status changes
+- ✅ **Verification**: Verify any shipment data against blockchain records
+- ✅ **Transparency**: Public blockchain provides transparency
+- ✅ **Gas Optimized**: Only stores hashes to minimize costs
+
+### Quick Start
+
+1. **Deploy Smart Contract**:
+   ```bash
+   # Use Remix IDE (https://remix.ethereum.org/)
+   # Copy ShipmentTracker.sol from root directory
+   # Deploy to Sepolia testnet
+   # Copy contract address
+   ```
+
+2. **Get Testnet Funds**:
+   - Visit https://sepoliafaucet.com/
+   - Get free Sepolia ETH for testing
+
+3. **Configure Environment**:
+   ```env
+   BLOCKCHAIN_ENABLED=true
+   BLOCKCHAIN_RPC_URL=https://sepolia.infura.io/v3/YOUR_PROJECT_ID
+   CONTRACT_ADDRESS=0xYOUR_CONTRACT_ADDRESS
+   BLOCKCHAIN_PRIVATE_KEY=0xYOUR_PRIVATE_KEY
+   ```
+
+4. **Test Integration**:
+   ```bash
+   npm run dev
+   # Create a shipment - check console for blockchain tx
+   # Update status - verify on https://sepolia.etherscan.io/
+   ```
+
+### Smart Contract
+
+The `ShipmentTracker.sol` contract provides:
+
+```solidity
+// Record shipment creation
+function createShipment(string shipmentId, string status)
+
+// Record status updates
+function updateShipmentStatus(string shipmentId, string status)
+
+// Get shipment history
+function getShipmentHistory(string shipmentId) returns (bytes32[])
+
+// Verify shipment data
+function verifyShipmentData(string shipmentId, bytes32 dataHash) returns (bool)
+```
+
+### Supported Networks
+
+- **Ethereum Sepolia** (Testnet) - Recommended for development
+- **Polygon Mumbai** (Testnet) - Faster and cheaper
+- **Ethereum Mainnet** (Production) - Most secure
+- **Polygon Mainnet** (Production) - Cost-effective
+- **Hyperledger Fabric** (Private) - Enterprise use cases
+
+### How It Works
+
+```
+Shipment Creation:
+  User creates shipment → API records on blockchain → Saves to MongoDB with tx hash
+
+Status Update:
+  User updates status → API records on blockchain → Updates MongoDB with new tx hash
+
+Verification:
+  Anyone can verify shipment data by checking blockchain transaction history
+```
+
+### Cost Estimation
+
+**Testnet (Free)**:
+- Deployment: Free (testnet ETH)
+- Per transaction: Free
+
+**Mainnet (Production)**:
+- Ethereum: ~$2-5 per transaction
+- Polygon: ~$0.001 per transaction (recommended)
+
+### Security Notes
+
+⚠️ **Important**:
+- Never commit `.env` file to git
+- Use separate wallets for development/production
+- Keep private keys secure
+- Only hashes are stored on-chain (GDPR compliant)
+
+### Resources
+
+- [Detailed Setup Guide](./BLOCKCHAIN_SETUP.md) (coming soon)
+- [Smart Contract Source](./ShipmentTracker.sol)
+- [Ethers.js Documentation](https://docs.ethers.org/)
+- [Sepolia Faucet](https://sepoliafaucet.com/)
+- [Sepolia Explorer](https://sepolia.etherscan.io/)
+
 ---
 
-Built with ❤️ using React Router.
+Built with ❤️ using React Router and Ethereum.

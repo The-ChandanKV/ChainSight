@@ -29,6 +29,8 @@ export interface IShipment {
   originCoords?: [number, number];
   destinationCoords?: [number, number];
   currentProgress?: number;
+  blockchainTxHash?: string; // Transaction hash for shipment creation
+  statusUpdateTxHashes?: string[]; // Array of transaction hashes for status updates
 }
 
 const shipmentSchema = new mongoose.Schema<IShipment>({
@@ -48,6 +50,8 @@ const shipmentSchema = new mongoose.Schema<IShipment>({
   originCoords: [Number],
   destinationCoords: [Number],
   currentProgress: Number,
+  blockchainTxHash: String, // Blockchain transaction hash for creation
+  statusUpdateTxHashes: [String], // Array of transaction hashes for status updates
 }, {
   timestamps: true
 });

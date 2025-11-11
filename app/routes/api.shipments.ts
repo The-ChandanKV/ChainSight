@@ -1,4 +1,48 @@
 import { connectDB, ShipmentModel } from "../models/shipment";
+import { ethers } from 'ethers';
+
+// Smart contract ABI
+const SHIPMENT_TRACKER_ABI = [
+  'function createShipment(string shipmentId, string status) external',
+  'event ShipmentCreated(string indexed shipmentId, bytes32 dataHash, uint256 timestamp)'
+];
+
+// Blockchain helper function
+async function recordOnBlockchain(shipmentId: string, status: string): Promise<string | null> {
+  const enabled = process.env.BLOCKCHAIN_ENABLED === 'true';
+  if (!enabled) {
+    console.log('Blockchain disabled, skipping on-chain recording');
+    return null;
+  }
+
+  try {
+    const rpcUrl = process.env.BLOCKCHAIN_RPC_URL || '';
+    const contractAddress = process.env.CONTRACT_ADDRESS || '';
+    const privateKey = process.env.BLOCKCHAIN_PRIVATE_KEY || '';
+
+    if (!rpcUrl || !contractAddress || !privateKey) {
+      console.warn('Blockchain not configured, skipping on-chain recording');
+      return null;
+    }
+
+    const provider = new ethers.JsonRpcProvider(rpcUrl);
+    const wallet = new ethers.Wallet(privateKey, provider);
+    const contract = new ethers.Contract(contractAddress, SHIPMENT_TRACKER_ABI, wallet);
+
+    console.log(`Recording shipment ${shipmentId} on blockchain...`);
+    const tx = await contract.createShipment(shipmentId, status);
+    console.log(`Transaction sent: ${tx.hash}`);
+    
+    // Wait for confirmation
+    await tx.wait();
+    console.log(`Transaction confirmed: ${tx.hash}`);
+    
+    return tx.hash;
+  } catch (error) {
+    console.error('Blockchain recording failed:', error);
+    return null; // Don't fail the entire operation if blockchain fails
+  }
+}
 
 // GET /api/shipments
 export async function loader({ request }: any) {
@@ -27,7 +71,16 @@ export async function action({ request }: any) {
 
   try {
     const data = await request.json();
-    const shipment = new ShipmentModel(data);
+    
+    // Record on blockchain first (async, non-blocking)
+    const txHash = await recordOnBlockchain(data.shipmentId, data.status || 'Created');
+    
+    // Save to database with blockchain tx hash
+    const shipment = new ShipmentModel({
+      ...data,
+      blockchainTxHash: txHash || undefined,
+      statusUpdateTxHashes: []
+    });
     const savedShipment = await shipment.save();
 
     const responseData = {
