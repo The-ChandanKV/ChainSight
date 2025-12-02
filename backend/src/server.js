@@ -267,6 +267,92 @@ app.get("/api/network", async (req, res) => {
     }
 });
 
+// AI Insights endpoint - proxies to ML service
+app.post("/api/insights", async (req, res) => {
+    try {
+        const ML_SERVICE_URL = process.env.ML_SERVICE_URL || "http://localhost:5000";
+
+        // Fetch all shipments from database
+        let shipments = [];
+
+        if (mongoose.connection.readyState === 1) {
+            const dbShipments = await Shipment.find({}).lean();
+
+            // Enrich with mock data for ML predictions
+            shipments = dbShipments.map(s => ({
+                shipment_id: s.shipmentId,
+                distance_km: Math.random() * 3000 + 200,
+                temperature_avg: Math.random() * 30 + 10,
+                temperature_variance: Math.random() * 10,
+                carrier_rating: Math.random() * 2 + 3,
+                package_weight: Math.random() * 50 + 5,
+                route_complexity: Math.floor(Math.random() * 5) + 1,
+                weather_score: Math.random() * 5 + 5,
+                is_fragile: Math.random() > 0.7 ? 1 : 0,
+                is_express: Math.random() > 0.6 ? 1 : 0
+            }));
+        }
+
+        // Try to get insights from ML service
+        try {
+            const fetch = (await import('node-fetch')).default;
+            const mlResponse = await fetch(`${ML_SERVICE_URL}/insights`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ shipments })
+            });
+
+            if (mlResponse.ok) {
+                const mlData = await mlResponse.json();
+                return res.json(mlData);
+            }
+        } catch (mlError) {
+            console.warn("ML service not available, returning mock insights:", mlError.message);
+        }
+
+        // Fallback: Return mock insights if ML service is not available
+        const totalShipments = shipments.length || 10;
+        const delayedShipments = Math.floor(totalShipments * 0.12);
+
+        res.json({
+            success: true,
+            insights: {
+                total_shipments: totalShipments,
+                delayed_shipments: delayedShipments,
+                delay_percentage: ((delayedShipments / totalShipments) * 100).toFixed(2),
+                average_delay_hours: 8.5,
+                high_risk_shipments: Math.floor(totalShipments * 0.08),
+                anomalies_detected: Math.floor(totalShipments * 0.05),
+                trends: [
+                    { week: 'Week 1', delayed: 5, on_time: 45 },
+                    { week: 'Week 2', delayed: 8, on_time: 42 },
+                    { week: 'Week 3', delayed: 6, on_time: 44 },
+                    { week: 'Week 4', delayed: delayedShipments, on_time: totalShipments - delayedShipments }
+                ],
+                risk_distribution: {
+                    low: Math.floor(totalShipments * 0.6),
+                    medium: Math.floor(totalShipments * 0.3),
+                    high: Math.floor(totalShipments * 0.1)
+                },
+                predictions: shipments.slice(0, 5).map((s, i) => ({
+                    shipment_id: s.shipment_id,
+                    delay_probability: (Math.random() * 0.5 + 0.1).toFixed(2),
+                    estimated_delay_hours: Math.random() * 12,
+                    anomaly_probability: (Math.random() * 0.3).toFixed(2),
+                    risk_score: (Math.random() * 40 + 20).toFixed(2)
+                }))
+            },
+            ml_service_available: false
+        });
+    } catch (error) {
+        console.error("Error fetching insights:", error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
 // Start server
 app.listen(PORT, () => {
     console.log(`\n🚀 ChainSight Server running on port ${PORT}`);

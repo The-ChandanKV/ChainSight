@@ -1,11 +1,9 @@
 const { ethers } = require("ethers");
 require("dotenv/config");
-const { fileURLToPath } = require("url");
-const { dirname, join } = require("path");
+const { join } = require("path");
 const { readFileSync } = require("fs");
 
-// For CommonJS, we need __dirname differently
-const __dirname = __filename ? dirname(__filename) : process.cwd();
+// In CommonJS, __dirname is already available as a global variable
 
 // Load contract ABI
 const contractPath = join(__dirname, "../artifacts/contracts/SupplyChain.sol/SupplyChain.json");
