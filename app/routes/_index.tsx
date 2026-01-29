@@ -96,25 +96,25 @@ export default function Index() {
         loop
         muted
         playsInline
-        className="absolute top-0 left-0 w-full h-full object-cover"
+        className="fixed top-0 left-0 w-full h-full object-cover z-0"
       >
         <source src="/Live.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
 
       {/* Dark Overlay with Gradient */}
-      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-black/60 via-black/50 to-black/70 z-10" />
+      <div className="fixed top-0 left-0 w-full h-full bg-gradient-to-b from-black/60 via-black/50 to-black/70 z-10" />
 
       {/* Animated Gradient Orbs */}
       <div
-        className="absolute w-96 h-96 rounded-full bg-gradient-to-r from-blue-600/30 to-purple-600/30 blur-3xl z-10 transition-all duration-1000 ease-out"
+        className="fixed w-96 h-96 rounded-full bg-gradient-to-r from-blue-600/30 to-purple-600/30 blur-3xl z-10 transition-all duration-1000 ease-out"
         style={{
           left: `${mousePosition.x * 0.02}px`,
           top: `${mousePosition.y * 0.02}px`,
         }}
       />
       <div
-        className="absolute right-0 bottom-0 w-96 h-96 rounded-full bg-gradient-to-r from-purple-600/20 to-pink-600/20 blur-3xl z-10 transition-all duration-1000 ease-out"
+        className="fixed right-0 bottom-0 w-96 h-96 rounded-full bg-gradient-to-r from-purple-600/20 to-pink-600/20 blur-3xl z-10 transition-all duration-1000 ease-out"
         style={{
           right: `${mousePosition.x * 0.01}px`,
           bottom: `${mousePosition.y * 0.01}px`,

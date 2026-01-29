@@ -64,7 +64,11 @@ export default function AIInsights() {
                 throw new Error(data.error || 'Unknown error');
             }
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to load insights');
+            let message = err instanceof Error ? err.message : 'Failed to load insights';
+            if (message.includes('Failed to fetch')) {
+                message = 'Cannot connect to server. Please ensure the backend is running on port 3001.';
+            }
+            setError(message);
             console.error('Error fetching insights:', err);
         } finally {
             setLoading(false);
@@ -257,7 +261,7 @@ export default function AIInsights() {
                                 cx="50%"
                                 cy="50%"
                                 labelLine={false}
-                                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                label={({ name, percent }: { name?: string; percent?: number }) => `${name || ''}: ${((percent || 0) * 100).toFixed(0)}%`}
                                 outerRadius={100}
                                 fill="#8884d8"
                                 dataKey="value"
@@ -310,8 +314,8 @@ export default function AIInsights() {
                                     <div className="flex justify-between items-center mb-2">
                                         <span className="font-mono text-blue-400">{pred.shipment_id}</span>
                                         <span className={`px-3 py-1 rounded-full text-xs font-semibold ${Number(pred.risk_score) >= 70 ? 'bg-red-500/20 text-red-400' :
-                                                Number(pred.risk_score) >= 40 ? 'bg-yellow-500/20 text-yellow-400' :
-                                                    'bg-green-500/20 text-green-400'
+                                            Number(pred.risk_score) >= 40 ? 'bg-yellow-500/20 text-yellow-400' :
+                                                'bg-green-500/20 text-green-400'
                                             }`}>
                                             Risk: {Number(pred.risk_score).toFixed(0)}%
                                         </span>
