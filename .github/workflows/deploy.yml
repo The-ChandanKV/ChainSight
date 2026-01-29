@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
   workflow_dispatch:
 
 permissions:
@@ -12,7 +12,7 @@ permissions:
 
 concurrency:
   group: "pages"
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -21,10 +21,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
           cache: 'npm'
 
       - name: Install dependencies
@@ -32,16 +32,15 @@ jobs:
 
       - name: Build
         run: npm run build
-        env:
-          CI: true
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
+      # Create 404.html for client-side routing fallback
+      - name: Copy index.html to 404.html
+        run: cp build/client/index.html build/client/404.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './build/client'
+          path: ./build/client
 
   deploy:
     environment:
