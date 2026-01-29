@@ -64,12 +64,30 @@ export default function AIInsights() {
                 throw new Error(data.error || 'Unknown error');
             }
         } catch (err) {
-            let message = err instanceof Error ? err.message : 'Failed to load insights';
-            if (message.includes('Failed to fetch')) {
-                message = 'Cannot connect to server. Please ensure the backend is running on port 3001.';
-            }
-            setError(message);
-            console.error('Error fetching insights:', err);
+            console.warn('Backend not available, using mock data for demo purposes:', err);
+            // Fallback to mock data for demo / GitHub Pages
+            setInsights({
+                total_shipments: 1250,
+                delayed_shipments: 142,
+                delay_percentage: 11.36,
+                average_delay_hours: 8.5,
+                high_risk_shipments: 85,
+                anomalies_detected: 42,
+                trends: [
+                    { week: 'Week 1', delayed: 5, on_time: 45 },
+                    { week: 'Week 2', delayed: 8, on_time: 42 },
+                    { week: 'Week 3', delayed: 6, on_time: 44 },
+                    { week: 'Week 4', delayed: 12, on_time: 38 }
+                ],
+                risk_distribution: { low: 750, medium: 350, high: 150 },
+                predictions: [
+                    { shipment_id: 'SHP-1001', delay_probability: 0.85, estimated_delay_hours: 12.5, anomaly_probability: 0.15, risk_score: 88 },
+                    { shipment_id: 'SHP-1004', delay_probability: 0.65, estimated_delay_hours: 4.2, anomaly_probability: 0.05, risk_score: 62 },
+                    { shipment_id: 'SHP-1009', delay_probability: 0.12, estimated_delay_hours: 0, anomaly_probability: 0.01, risk_score: 15 },
+                    { shipment_id: 'SHP-1012', delay_probability: 0.92, estimated_delay_hours: 24.0, anomaly_probability: 0.45, risk_score: 95 },
+                    { shipment_id: 'SHP-1015', delay_probability: 0.35, estimated_delay_hours: 1.5, anomaly_probability: 0.02, risk_score: 38 }
+                ]
+            });
         } finally {
             setLoading(false);
         }
